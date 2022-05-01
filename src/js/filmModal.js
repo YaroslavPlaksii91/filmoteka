@@ -20,6 +20,8 @@ const filmsListRef = document.querySelector('.films');
 const closeBtnRef = document.querySelector('.closeModal');
 const modal = document.querySelector('.modal__container');
 const libraryBtnRef = document.querySelector('.btn2');
+const watchedBtnRef = document.querySelector('.watched');
+const queueBtnRef = document.querySelector('.queue');
 const userData = {
   queue: {},
   watched: {},
@@ -112,8 +114,12 @@ function makeFilmModalMarkup({
   overview,
   popularity,
   id,
+  backdrop_path,
 }) {
   const filmGenres = genres.map(({ name }) => name).join(', ');
+  const backdrop = document.querySelector('.modal__backdrop');
+  backdrop.style.backgroundImage = `url('https://image.tmdb.org/t/p/original${backdrop_path}')`;
+
   return `<div class="film__image">
       <img class="image" src=https://image.tmdb.org/t/p/original${poster_path} alt=${
     title || original_title || name
@@ -264,8 +270,8 @@ function onWatchedModalBtnClick(e) {
     userData.watched[e.target.dataset.id] = filmName.textContent;
     firebase.delWatched();
     watchedModalBtn.textContent = 'Add to watched';
-    if (lng === "uk") {
-      watchedModalBtn.textContent = 'Додати до переглянутого'
+    if (lng === 'uk') {
+      watchedModalBtn.textContent = 'Додати до переглянутого';
     }
 
     if (libraryBtnRef.classList.contains('current')) {
@@ -302,6 +308,8 @@ function onWatchedModalBtnClick(e) {
               if (snapshot.exists()) {
                 const ids = Object.keys(snapshot.val());
                 resetErrorStyles();
+                watchedBtnRef.classList.add('header__library-buttons-button--active');
+                queueBtnRef.classList.remove('header__library-buttons-button--active');
                 renderMarkupByIds(ids);
               }
             })
@@ -311,9 +319,9 @@ function onWatchedModalBtnClick(e) {
     }
 
     watchedModalBtn.textContent = 'Remove';
-    if (lng === "uk") {
-        watchedModalBtn.textContent = 'Видалити'
-     }
+    if (lng === 'uk') {
+      watchedModalBtn.textContent = 'Видалити';
+    }
   }
 
   watchedModalBtn.classList.toggle('active');
@@ -351,8 +359,8 @@ function onQueueModalBtnClick(e) {
       });
     }
     queueModalBtn.textContent = 'Add to queue';
-    if (lng === "uk") {
-      queueModalBtn.textContent = 'Додати до черги'
+    if (lng === 'uk') {
+      queueModalBtn.textContent = 'Додати до черги';
     }
   } else {
     firebase.queue = {
@@ -369,6 +377,8 @@ function onQueueModalBtnClick(e) {
               if (snapshot.exists()) {
                 const ids = Object.keys(snapshot.val());
                 resetErrorStyles();
+                watchedBtnRef.classList.remove('header__library-buttons-button--active');
+                queueBtnRef.classList.add('header__library-buttons-button--active');
                 renderMarkupByIds(ids);
               }
             })
@@ -476,7 +486,7 @@ async function onArrowsKeydown() {
               queueModalBtn.classList.add('active');
               queueModalBtn.textContent = 'Remove';
               if (lng === 'uk') {
-                queueModalBtn.textContent = 'Видалити'
+                queueModalBtn.textContent = 'Видалити';
               }
             }
           }
